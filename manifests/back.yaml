@@ -1,0 +1,41 @@
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: myapp-back-sv
+  namespace: myapp
+spec:
+  selector:
+    app: myapp-back
+  type: NodePort
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 5000
+      nodePort: 32017
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: myapp-back-deploy
+  namespace: myapp
+spec:
+  selector:
+    matchLabels:
+      app: myapp-back
+  replicas: 1
+  minReadySeconds: 10
+  template:
+    metadata:
+      labels:
+        app: myapp-back
+    spec:
+      containers:
+        - image: 127.0.0.1:5001/myapp-back:v4
+          #imagePullPolicy: Never
+          name: myapp-back-pod
+          ports:
+            - containerPort: 5000
+      imagePullSecrets:
+        - name: regcred
+
