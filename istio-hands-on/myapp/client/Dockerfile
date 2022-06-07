@@ -1,3 +1,7 @@
-FROM nginx:alpine
-COPY ./default.conf /etc/nginx/conf.d/default.conf
-COPY ./code /usr/share/nginx/html
+FROM node
+WORKDIR /usr/src/app
+COPY ./package*.json ./
+RUN npm install
+COPY . .
+EXPOSE 5000 
+CMD  node app.js 
