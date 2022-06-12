@@ -1,1 +1,22 @@
-k
+apiVersion: "cilium.io/v2"
+kind: CiliumNetworkPolicy
+metadata:
+  name: myapp-back-cnp
+  namespace: myapp
+spec:
+  description: "Allow the myapp-front to communicate with mymyapp-back"
+  endpointSelector:
+    matchLabels:
+      app: myapp-back
+  ingress:
+  - fromEndpoints:
+    - matchLabels:
+        app: myapp-front
+    toPorts:
+    - ports:
+      - port: "5000"
+        protocol: TCP
+      rules:
+        http:
+        - method: "GET"
+          path: "/"
