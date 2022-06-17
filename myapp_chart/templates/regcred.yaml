@@ -1,0 +1,14 @@
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: {{ .Release.Name }}-regcred
+  {{- if .Values.secret_namespace }}
+  namespace: {{ .Values.secret_namespace }}
+  {{- else }}
+  namespace: myapp
+  {{- end }}
+
+data:
+  .dockerconfigjson: ewoJImF1dGhzIjogewoJCSIxMjcuMC4wLjE6NTAwMSI6IHsKCQkJImF1dGgiOiAiWVdSdGFXNDZZV1J0YVc0PSIKCQl9Cgl9Cn0= 
+type: kubernetes.io/dockerconfigjson

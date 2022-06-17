@@ -1,0 +1,28 @@
+
+front_image:
+   name: 127.0.0.1:5001/myapp-front
+   tag: v1.2
+
+front_replicas: 
+
+front_namespace:
+
+front_containerPorts:
+  - name: http
+    port: 5000
+
+front_service_nodePort: 32016
+   
+
+back_image:
+   name: 127.0.0.1:5001/myapp-back
+   tag: v4
+
+back_replicas:
+
+back_namespace:
+
+back_containerPorts:
+   - name: http
+     port: 5000
+

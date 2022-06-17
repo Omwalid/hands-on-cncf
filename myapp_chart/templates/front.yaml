@@ -1,0 +1,57 @@
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ .Release.Name }}-myapp-front-sv
+  {{- if .Values.front_namespace }}
+  namespace: {{ .Values.front_namespace }}
+  {{- else }}
+  namespace: myapp
+  {{- end }}
+spec:
+  selector:
+    app: {{ .Release.Name }}-myapp-front
+  type: NodePort
+  ports:
+    - name: http
+      protocol: TCP
+      port: 80
+      targetPort: 5000
+      nodePort: {{ .Values.front_service_nodePort }}
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Release.Name }}-myapp-front-deploy
+  {{- if .Values.front_namespace }}
+  namespace: {{ .Values.front_namespace }}
+  {{- else }}
+  namespace: myapp
+  {{- end }}
+
+spec:
+  selector:
+    matchLabels:
+      app: {{ .Release.Name }}-myapp-front
+  replicas: {{ default 1 .Values.front_replicas }}
+  minReadySeconds: 10
+  template:
+    metadata:
+      labels:
+        app: {{ .Release.Name }}-myapp-front
+    spec:
+      containers:
+        - image: {{  printf "%s:%s" .Values.front_image.name .Values.front_image.tag }}
+          #imagePullPolicy: Never
+          name: {{ .Release.Name }}-myapp-front-pod
+          ports:
+            {{- range .Values.front_containerPorts }}
+            - containerPort: {{ .port }}
+            {{- end }}
+      imagePullSecrets:
+          {{- if .Values.secret_namespace }}
+          name: {{ .Values.secret_namespace }}.{{ .Release.Name }}-regcred
+          {{- else }}
+          - name: myapp.{{ .Release.Name }}-regcred
+          {{- end }}
+

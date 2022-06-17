@@ -1,0 +1,51 @@
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ .Release.Name }}-myapp-back-sv
+  {{- if .Values.namespace }}
+  namespace: {{ .Values.namespace }}
+  {{- else }}
+  namespace: myapp
+  {{- end }}
+spec:
+  selector:
+    app: {{ .Release.Name }}-myapp-back
+  ports:
+    - protocol: TCP
+      name: http
+      port: 80
+      targetPort: 5000
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Release.Name }}-myapp-back-deploy
+  {{- if .Values.back_namespace }}
+  namespace: {{ .Values.back_namespace }}
+  {{- else }}
+  namespace: myapp
+  {{- end }}
+
+spec:
+  selector:
+    matchLabels:
+      app: {{ .Release.Name }}-myapp-back
+  replicas: {{ default 1 .Values.back_replicas }}
+  minReadySeconds: 10
+  template:
+    metadata:
+      labels:
+        app: {{ .Release.Name }}-myapp-back
+    spec:
+      containers:
+        - image: {{  printf "%s:%s" .Values.back_image.name .Values.back_image.tag }} 
+          #imagePullPolicy: Never
+          name: {{ .Release.Name }}-myapp-back-pod
+          ports:
+            {{- range .Values.back_containerPorts }}
+            - containerPort: {{ .port }}
+            {{- end }}
+      imagePullSecrets:
+        - name: regcred
+

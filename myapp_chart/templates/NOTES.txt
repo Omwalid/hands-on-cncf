@@ -1,0 +1,1 @@
+myapp application is deployed through helm chart
